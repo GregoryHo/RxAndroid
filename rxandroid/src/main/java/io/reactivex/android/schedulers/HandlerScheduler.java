@@ -31,7 +31,6 @@ final class HandlerScheduler extends Scheduler {
     @Override
     public Disposable scheduleDirect(Runnable run, long delay, TimeUnit unit) {
         if (run == null) throw new NullPointerException("run == null");
-        if (delay < 0) throw new IllegalArgumentException("delay < 0: " + delay);
         if (unit == null) throw new NullPointerException("unit == null");
 
         run = RxJavaPlugins.onSchedule(run);
@@ -57,7 +56,6 @@ final class HandlerScheduler extends Scheduler {
         @Override
         public Disposable schedule(Runnable run, long delay, TimeUnit unit) {
             if (run == null) throw new NullPointerException("run == null");
-            if (delay < 0) throw new IllegalArgumentException("delay < 0: " + delay);
             if (unit == null) throw new NullPointerException("unit == null");
 
             if (disposed) {
@@ -110,11 +108,7 @@ final class HandlerScheduler extends Scheduler {
             try {
                 delegate.run();
             } catch (Throwable t) {
-                IllegalStateException ie =
-                    new IllegalStateException("Fatal Exception thrown on Scheduler.", t);
-                RxJavaPlugins.onError(ie);
-                Thread thread = Thread.currentThread();
-                thread.getUncaughtExceptionHandler().uncaughtException(thread, ie);
+                RxJavaPlugins.onError(t);
             }
         }
 
